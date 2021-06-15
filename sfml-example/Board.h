@@ -57,6 +57,11 @@ namespace Tetris {
 		float lineClearDelayTimer = 0;
 
 		int total_line_sent = 0;
+		int total_t_clear = 0;
+		int total_tetris = 0;
+
+		sf::SoundBuffer sound_clear;
+		sf::Sound sound;
 	private:
 		Board *enemy = nullptr;
 

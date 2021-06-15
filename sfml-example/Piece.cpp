@@ -174,6 +174,10 @@ Tetris::Piece::Piece()
 	this->srsData['T'] = this->srsData['J'];
 	this->srsData['Z'] = this->srsData['J'];
 	this->srsData['O'] = { { {} } };
+
+	this->sound_place.loadFromFile("Content/Audio/place.wav");
+	this->sound_move.loadFromFile("Content/Audio/move.wav");
+	this->sound.setVolume(5.0f);
 }
 
 void Tetris::Piece::setType(char type)
@@ -227,12 +231,16 @@ void Tetris::Piece::init()
 
 void Tetris::Piece::lock()
 {
+	this->sound.setBuffer(this->sound_place);
+	this->sound.play();
 	this->locked = true;
 }
 
 void Tetris::Piece::tryLeft(std::array<std::array<int, 10>, 40> board_data)
 {
 	if (!this->isColliding(this->x - 1, this->y, board_data)) {
+		this->sound.setBuffer(this->sound_move);
+		this->sound.play();
 		this->x--;
 		this->onFloorTimer = 0;
 	}
@@ -241,6 +249,8 @@ void Tetris::Piece::tryLeft(std::array<std::array<int, 10>, 40> board_data)
 void Tetris::Piece::tryRight(std::array<std::array<int, 10>, 40> board_data)
 {
 	if (!this->isColliding(this->x + 1, this->y, board_data)) {
+		this->sound.setBuffer(this->sound_move);
+		this->sound.play();
 		this->x++;
 		this->onFloorTimer = 0;
 	}

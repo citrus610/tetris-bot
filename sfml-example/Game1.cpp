@@ -17,16 +17,24 @@ void Game1::load()
 	this->gameover_timer = 4.0f;
 	this->new_game_timer = 4.0f;
 
+	std::ifstream file;
+	file.open("init.json");
+	json js;
+	file >> js;
+	set_weight_js(this->w_1, js, 1);
+	set_weight_js(this->w_2, js, 2);
+	file.close();
+
 	if (this->is_1_bot) {
 		this->board1.enableAI();
 		///*
-		this->bot_1.thread_start();
+		this->bot_1.thread_start(7, this->w_1);
 
 		bot_data data_1;
 		data_1.current = char_to_piece(this->board1.currentPiece);
-		data_1.hold = char_to_piece(this->board1.holdPiece);
-		data_1.b2b = this->board1.isB2bReady;
-		data_1.ren = this->board1.ren;
+		data_1.hold = PIECE_NONE;
+		data_1.b2b = false;
+		data_1.ren = 0;
 		for (auto & p : this->board1.nextPiece) {
 			data_1.next.add(char_to_piece(p));
 		}
@@ -40,13 +48,13 @@ void Game1::load()
 	if (this->is_2_bot) {
 		this->board2.enableAI();
 		///*
-		this->bot_2.thread_start();
+		this->bot_2.thread_start(7, this->w_2);
 
 		bot_data data_2;
 		data_2.current = char_to_piece(this->board2.currentPiece);
-		data_2.hold = char_to_piece(this->board2.holdPiece);
-		data_2.b2b = this->board2.isB2bReady;
-		data_2.ren = this->board2.ren;
+		data_2.hold = PIECE_NONE;
+		data_2.b2b = false;
+		data_2.ren = 0;
 		for (auto & p : this->board2.nextPiece) {
 			data_2.next.add(char_to_piece(p));
 		}
@@ -75,9 +83,9 @@ void Game1::update(float dt)
 			if (this->is_1_bot) {
 				bot_data data_1;
 				data_1.current = char_to_piece(this->board1.currentPiece);
-				data_1.hold = char_to_piece(this->board1.holdPiece);
-				data_1.b2b = this->board1.isB2bReady;
-				data_1.ren = this->board1.ren;
+				data_1.hold = PIECE_NONE;
+				data_1.b2b = false;
+				data_1.ren = 0;
 				for (auto & p : this->board1.nextPiece) {
 					data_1.next.add(char_to_piece(p));
 				}
@@ -87,17 +95,19 @@ void Game1::update(float dt)
 
 				this->bot_1.set_new_data(data_1);
 
+				this->input_timer_1 = 0.0f;
 				this->solution_index_1 = 999;
 				this->need_new_solution_1 = true;
-				this->last_solution_1 = std::vector<move>();
+				this->last_solution_1.clear();
+				this->last_solution_1.shrink_to_fit();
 			}
 
 			if (this->is_2_bot) {
 				bot_data data_2;
 				data_2.current = char_to_piece(this->board2.currentPiece);
-				data_2.hold = char_to_piece(this->board2.holdPiece);
-				data_2.b2b = this->board2.isB2bReady;
-				data_2.ren = this->board2.ren;
+				data_2.hold = PIECE_NONE;
+				data_2.b2b = false;
+				data_2.ren = 0;
 				for (auto & p : this->board2.nextPiece) {
 					data_2.next.add(char_to_piece(p));
 				}
@@ -107,9 +117,11 @@ void Game1::update(float dt)
 
 				this->bot_2.set_new_data(data_2);
 
+				this->input_timer_2 = 0.0f;
 				this->solution_index_2 = 999;
 				this->need_new_solution_2 = true;
-				this->last_solution_2 = std::vector<move>();
+				this->last_solution_2.clear();
+				this->last_solution_2.shrink_to_fit();
 			}
 		}
 
@@ -205,7 +217,7 @@ void Game1::update(float dt)
 							this->input_timer_1 = 0;
 							this->need_new_solution_1 = true;
 							this->last_solution_1 = std::vector<move>();
-							this->board1.lineClearDelayTimer = 0.46f;
+							this->board1.lineClearDelayTimer = 0.45f;
 						}
 					}
 					else { // SD
@@ -281,7 +293,7 @@ void Game1::update(float dt)
 				bot_data new_data{ new_n.board, new_n.current, new_n.hold, next_q, new_n.b2b, new_n.ren };
 
 				this->bot_2.set_new_data(new_data);
-
+				
 			}//*/
 
 			if (this->solution_index_2 < (int)this->last_solution_2.size() && this->need_new_solution_2 == false) {
@@ -320,7 +332,7 @@ void Game1::update(float dt)
 							this->input_timer_2 = 0;
 							this->need_new_solution_2 = true;
 							this->last_solution_2 = std::vector<move>();
-							this->board2.lineClearDelayTimer = 0.46f;
+							this->board2.lineClearDelayTimer = 0.45f;
 						}
 					}
 					else {
@@ -368,7 +380,7 @@ void Game1::render()
 	this->board1.render(&this->canvas);
 	this->board2.render(&this->canvas);
 
-	if (this->new_game_timer < 3.0f) { // forgive me master, i have failed you, i don't want to do math :<
+	if (this->new_game_timer < 3.0f) { // i don't want to do math :<
 		this->sprite_image_of_number.setOrigin(10, 15);
 		this->sprite_image_of_number.setPosition(960, 525);
 		this->sprite_image_of_number.setScale(4, 4);

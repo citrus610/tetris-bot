@@ -3,6 +3,8 @@
 
 Tetris::Board::Board()
 {
+	this->sound_clear.loadFromFile("Content/Audio/clear.wav");
+	this->sound.setVolume(20.f);
 }
 
 void Tetris::Board::init()
@@ -114,6 +116,8 @@ void Tetris::Board::init()
 	this->pos_of_piece_in_image['O'] = 6;
 
 	this->total_line_sent = 0;
+	this->total_t_clear = 0;
+	this->total_tetris = 0;
 }
 
 void Tetris::Board::setEnemy(Board* _enemy)
@@ -215,6 +219,10 @@ std::vector<int> Tetris::Board::fullRowList()
 
 void Tetris::Board::clearFullRow(std::vector<int> full_row_list)
 {
+	if (!full_row_list.empty()) {
+		//this->sound.setBuffer(this->sound_clear);
+		//this->sound.play();
+	}
 	for (int i = 0; i < (int)full_row_list.size(); i++) {
 		for (int k = full_row_list[i]; k > 0; k--) {
 			this->data[k] = this->data[k - 1];
@@ -308,7 +316,7 @@ void Tetris::Board::placeGarbage()
 		return;
 	}
 
-	if (this->garbage <= 4) {
+	if (this->garbage < 4) {
 		g_dist.push_back(this->garbage);
 	}
 	else {
@@ -369,15 +377,17 @@ void Tetris::Board::update(float dt)
 				std::vector<int> full_row_list = this->fullRowList();
 				int count_garbage = this->countGarbageSent(t_spin, full_row_list);
 				this->total_line_sent += count_garbage;
+				if (full_row_list.size() > 0 && t_spin) this->total_t_clear += (int)full_row_list.size();
+				if (full_row_list.size() >= 4) this->total_tetris += 1;
 				if (full_row_list.size() < 1) {
-					if (this->margin_time >= 0.5f) {
+					if (this->margin_time >= 0.33f) {
 						this->placeGarbage();
 					}
 				}
 				else {
 					if (this->garbage > count_garbage) {
 						this->garbage -= count_garbage;
-						if (this->margin_time >= 0.5f) {
+						if (this->margin_time >= 0.33f) {
 							this->placeGarbage();
 						}
 					}
@@ -386,6 +396,8 @@ void Tetris::Board::update(float dt)
 						this->garbage = 0;
 					}
 					this->lineClearDelayTimer = 0;
+					this->sound.setBuffer(this->sound_clear);
+					this->sound.play();
 				}
 				this->changePiece();
 			}

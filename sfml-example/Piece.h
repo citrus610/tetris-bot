@@ -5,6 +5,8 @@
 #include <vector>
 #include <array>
 
+#include <SFML/Audio.hpp>
+
 #include "Input.h"
 
 namespace Tetris {
@@ -42,6 +44,9 @@ namespace Tetris {
 		std::unordered_map<char, std::vector<std::vector<std::vector<int>>>> form;
 
 		bool aiEnable = false;
+
+		sf::SoundBuffer sound_move, sound_place, sound_clear;
+		sf::Sound sound;
 	private:
 		char type = ' ';
 		bool locked = false;

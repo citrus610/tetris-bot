@@ -24,15 +24,17 @@ public:
 	bool is_1_bot = false;
 	bool is_2_bot = false;
 
-	float bot_input_delay = 0.043f;
+	float bot_input_delay = 0.04666f;
 
 	bot bot_1;
+	weight w_1;
 	std::vector<move> last_solution_1;
 	bool need_new_solution_1 = true;
 	int solution_index_1 = 999;
 	float input_timer_1 = 0.0f;
 
 	bot bot_2;
+	weight w_2;
 	std::vector<move> last_solution_2;
 	bool need_new_solution_2 = true;
 	int solution_index_2 = 999;
