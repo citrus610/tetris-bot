@@ -5,7 +5,7 @@
 struct bitpiece
 {
 	piece type;
-	int x, y, current_form;
+	int x = 0, y = 0, current_form = 0;
 
 	void init(piece type) {
 		y = 18;

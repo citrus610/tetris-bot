@@ -323,7 +323,7 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 			beam::expand(stack[memory.size], stack[memory.size + 1], 1, false, (memory.size == depth - 1), node_count);
 			/*for (auto & child_node : stack[memory.size + 1]) {
 				child_node.score += abs(child_node.score) * (rand() % 5 + 5) / 100;
-			}*/
+			}//*/
 		}
 
 		// level 1 search

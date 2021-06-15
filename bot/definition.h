@@ -7,6 +7,8 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include "vec.h"
 
@@ -59,10 +61,10 @@ struct weight {
 	int top_height = -32;
 	int top_height_top_half = -150;
 	int top_height_top_quarter = -611;
-	int bumpiness = -34;
-	int bumpiness_s = -8;
-	int well = 60;
-	int hole = -272;
+	int bumpiness = -24;
+	int bumpiness_s = -7;
+	int well = 57;
+	int hole = -173;
 	int blocked_cell = -77;
 	int block_above_hole = -47;
 	int block_above_hole_s = -1;
@@ -70,26 +72,28 @@ struct weight {
 	int well_2_9 = 20;
 	int well_3_8 = 15;
 	int well_center = 60;
-	int structure[3] = { 298, 492, 527 };
+	int structure[2] = { 298, 492 };
 	int b2b_max_chain = 204;
-	int ren_max_chain = 119;
-	int b2b_clear = 104;
+	int ren_max_chain = 12;
+	int b2b_clear = 204;
 	int ren_clear = 12;
-	int line_sent = 101;
+	int line_sent = 0;
 	int perfect_clear = 9999;
-	int t_spin_1 = -57;
-	int t_spin_2 = 435;
-	int t_spin_3 = 708;
-	int tetris = 410;
+	int t_spin_1 = 121;
+	int t_spin_2 = 410;
+	int t_spin_3 = 602;
+	int tetris = 390;
 	int burn_1 = -295;
 	int burn_2 = -237;
 	int burn_3 = -128;
-	int waste_time = -255;
-	int waste_structure[3] = { -215, -155, -205 };
+	int waste_time = -55;
+	int waste_structure[2] = { -215, -205 };
 	int waste_T = -302;
 	int waste_I = -27;
-	int hold_T = 42;
-	int hold_I = 53;
+	int hold_T = 0;
+	int hold_I = 0;
+
+	void set(const std::string& file_path);
 };
 
 static std::unordered_map<piece, std::vector<std::vector<move>>> path_hd{

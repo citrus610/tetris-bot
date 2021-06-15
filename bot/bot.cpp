@@ -2,11 +2,15 @@
 
 void bot::thread_start()
 {
+	solution_ready = false;
+	running = true;
 	this->thread = new std::thread([&]() {
 		beam a(7);
 		int iter_num = 0;
 		int stack_index = 0;
 		int node_count = 0;
+
+		a.evaluator.w.set("init.json");
 
 		int solution = 0b1111111111111111;
 
@@ -66,6 +70,8 @@ void bot::thread_start()
 
 void bot::thread_start(int depth, weight w)
 {
+	solution_ready = false;
+	running = true;
 	this->thread = new std::thread([&](int bot_depth, weight bot_weight) {
 		beam a(bot_depth);
 		int iter_num = 0;
@@ -133,10 +139,14 @@ void bot::thread_start(int depth, weight w)
 void bot::thread_destroy()
 {
 	std::unique_lock<std::mutex> lk(mutex);
+	if (!running) {
+		return;
+	}
 	running = false;
 	lk.unlock();
 	this->thread->join();
 	delete this->thread;
+	this->thread = nullptr;
 }
 
 path_data bot::request_solution()

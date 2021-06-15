@@ -10,7 +10,6 @@ void node::attempt(node & child, bool hold, const std::vector<move>& path, vec16
 	child.ren = this->ren;
 	child.p_t_struct[0] = this->t_struct[0];
 	child.p_t_struct[1] = this->t_struct[1];
-	child.p_t_struct[2] = this->t_struct[2];
 	child.tspin_1 = this->tspin_1;
 	child.tspin_2 = this->tspin_2;
 	child.tspin_3 = this->tspin_3;
@@ -27,7 +26,6 @@ void node::attempt(node & child, bool hold, const std::vector<move>& path, vec16
 	child.time_wasted = this->time_wasted;
 	child.t_struct_wasted[0] = this->t_struct_wasted[0];
 	child.t_struct_wasted[1] = this->t_struct_wasted[1];
-	child.t_struct_wasted[2] = this->t_struct_wasted[2];
 
 	bitpiece s_piece;
 	if (hold) {

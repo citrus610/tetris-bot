@@ -11,7 +11,7 @@ public:
 	void reset(bool keep_memory);
 
 	int depth;
-	int width[16] = { 50, 100, 100, 125, 125, 150, 150, 150, 150, 175, 175, 175, 175, 200, 200, 200 };
+	int width[16] = { 40, 100, 100, 125, 125, 150, 150, 150, 150, 175, 175, 175, 175, 200, 200, 200 };
 	vec16<piece> next_queue;
 	vec16<int> memory;
 	std::vector<std::vector<node>> stack;

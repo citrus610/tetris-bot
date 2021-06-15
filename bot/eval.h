@@ -12,7 +12,7 @@ struct eval
 	void bumpiness(int column_height[10], int result[2]);
 	void blocked_cell_hole(bitboard& board, int column_height[10], int result[2]);
 	void block_above_hole(bitboard& board, int column_height[10], int result[2]);
-	void structure(bitboard& board, int column_height[10], int result[3]);
+	void structure(bitboard& board, int column_height[10], int result[2]);
 };
 
 inline int eval::evaluate(node & node)
@@ -94,7 +94,7 @@ inline int eval::evaluate(node & node)
 
 	// structure
 	this->structure(node.board, column_height, node.t_struct);
-	result += node.t_struct[0] * w.structure[0] + node.t_struct[1] * w.structure[1] + node.t_struct[2] * w.structure[2];
+	result += node.t_struct[0] * w.structure[0] + node.t_struct[1] * w.structure[1];
 
 	// waste structure
 	// DEFINITION: if the number of structures is smaller than the previous generation's, but there isn't any t spins, then structures are wasted
@@ -104,11 +104,11 @@ inline int eval::evaluate(node & node)
 			//result += ((node.p_struct_tsd + node.p_struct_stsd + node.p_struct_tst) - (node.struct_tsd + node.struct_stsd + node.struct_tst)) * w.waste_structure;
 			node.struct_wasted += ((node.p_struct_tsd + node.p_struct_stsd + node.p_struct_tst) - (node.struct_tsd + node.struct_stsd + node.struct_tst));
 		}*/
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 2; ++i) {
 			node.t_struct_wasted[i] += std::min(0, node.p_t_struct[i] - node.t_struct[i]);
 		}
 	}
-	result += node.t_struct_wasted[0] * w.waste_structure[0] + node.t_struct_wasted[1] * w.waste_structure[1] + node.t_struct_wasted[2] * w.waste_structure[2];
+	result += node.t_struct_wasted[0] * w.waste_structure[0] + node.t_struct_wasted[1] * w.waste_structure[1];
 
 	// hole and blocked_cell
 	int blocked_cell_hole[2] = { 0, 0 };
@@ -234,7 +234,7 @@ inline void eval::block_above_hole(bitboard& board, int column_height[10], int r
 	}
 }
 
-inline void eval::structure(bitboard& board, int column_height[10], int result[3])
+inline void eval::structure(bitboard& board, int column_height[10], int result[2])
 {
 
 	/*
@@ -272,11 +272,22 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[3
 	0b110
 	0b100
 	0b110
+
+	0b100
+	0b000
+	0b01?
+	0b00?
+	0b0??
+
+	0b001
+	0b000
+	0b?10
+	0b?00
+	0b??0
 	*/
 
 	result[0] = 0;
 	result[1] = 0;
-	result[2] = 0;
 
 	int max_height = 0;
 	for (int i = 0; i < 10; ++i) {
@@ -303,6 +314,7 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[3
 
 			// STSD & TST
 			if (y < 36) {
+				/*
 				if ((
 					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
 					((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
@@ -337,7 +349,24 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[3
 							column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 							)) {
 						result[2]++;
-					}
+				}*/
+				if ((
+					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
+					((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
+					((board.row[y + 2] >> (7 - x)) & 0b110) == 0b010 &&
+					((board.row[y + 3] >> (7 - x)) & 0b110) == 0b000 &&
+					((board.row[y + 4] >> (7 - x)) & 0b100) == 0b000 &&
+					column_height[x + 1] < 40 - y && column_height[x + 2] < 40 - y
+					) || (
+					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b001 &&
+					((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
+					((board.row[y + 2] >> (7 - x)) & 0b011) == 0b010 &&
+					((board.row[y + 3] >> (7 - x)) & 0b011) == 0b000 &&
+					((board.row[y + 4] >> (7 - x)) & 0b001) == 0b000 &&
+					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
+					)) {
+					result[1]++;
+				}
 			}
 		}
 	}

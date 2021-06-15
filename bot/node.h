@@ -39,9 +39,9 @@ struct node
 	int struct_tsd_wasted = 0;
 	int struct_tsd_wasted = 0;
 	int struct_tsd_wasted = 0;*/
-	int t_struct[3] = { 0, 0, 0 };
-	int p_t_struct[3] = { 0, 0, 0 };
-	int t_struct_wasted[3] = { 0, 0, 0 };
+	int t_struct[2] = { 0, 0 };
+	int p_t_struct[2] = { 0, 0 };
+	int t_struct_wasted[2] = { 0, 0 };
 
 	int score = 0;
 	vec16<int> path; // the path lead to this node
