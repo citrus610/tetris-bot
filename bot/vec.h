@@ -1,6 +1,7 @@
 #pragma once
 
 // a array wray to vec :v
+// this is ugly and sacrilegious, but i don't wanna use std::vector
 
 template <typename T>
 struct vec8
