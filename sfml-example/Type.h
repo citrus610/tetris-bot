@@ -69,8 +69,8 @@ static void set_weight_js(weight & w, json js, int player) {
 	w.burn_2 = js[plr]["burn_2"];
 	w.burn_3 = js[plr]["burn_3"];
 	w.waste_time = js[plr]["waste_time"];
-	for (int i = 0; i < 3; ++i) {
-		w.waste_structure[0] = js[plr]["waste_structure"][0];
+	for (int i = 0; i < 2; ++i) {
+		w.waste_structure[i] = js[plr]["waste_structure"][i];
 	}
 	w.waste_T = js[plr]["waste_T"];
 	w.waste_I = js[plr]["waste_I"];

@@ -38,8 +38,8 @@ void weight::set(const std::string & file_path)
 	this->burn_2 = js["burn_2"];
 	this->burn_3 = js["burn_3"];
 	this->waste_time = js["waste_time"];
-	for (int i = 0; i < 3; ++i) {
-		this->waste_structure[0] = js["waste_structure"][0];
+	for (int i = 0; i < 2; ++i) {
+		this->waste_structure[i] = js["waste_structure"][i];
 	}
 	this->waste_T = js["waste_T"];
 	this->waste_I = js["waste_I"];
