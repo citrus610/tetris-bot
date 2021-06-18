@@ -55,45 +55,46 @@ struct path_data {
 		type = (piece)((other & 0b11100) >> 2);
 		index = (other >> 5) & 0b11111111;
 	}
+
+	int node_count = 0;
+	int depth = 0;
 };
 
 struct weight {
 	int top_height = -34;
 	int top_height_top_half = -150;
 	int top_height_top_quarter = -671;
-	int bumpiness = -25;
-	int bumpiness_s = -6;
-	int well = 70;
+	int bumpiness = -26;
+	int bumpiness_s = -5;
+	int well = 77;
 	int hole = -176;
-	int blocked_cell = -189;
-	int block_above_hole = -18;
+	int blocked_cell = -209;
+	int block_above_hole = -47;
 	int block_above_hole_s = -1;
 	int well_1_10 = 20;
 	int well_2_9 = 20;
 	int well_3_8 = 24;
 	int well_center = 60;
-	int structure[2] = { 402, 201 };
-	int b2b_max_chain = 214;
-	int ren_max_chain = 218;
+	int structure[2] = { 402, 407 };
+	int b2b_max_chain = 204;
+	int ren_max_chain = 12;
 	int b2b_clear = 104;
 	int ren_clear = 12;
-	int line_sent = 57;
+	int line_sent = 0;
 	int perfect_clear = 9999;
-	int t_spin_1 = -167;
+	int t_spin_1 = -117;
 	int t_spin_2 = 410;
-	int t_spin_3 = 602;
+	int t_spin_3 = 683;
 	int tetris = 401;
-	int burn_1 = -255;
-	int burn_2 = -155;
-	int burn_3 = -98;
-	int waste_time = -375;
-	int waste_structure[2] = { -252, -355 };
-	int waste_T = -196;
+	int burn_1 = -295;
+	int burn_2 = -237;
+	int burn_3 = -128;
+	int waste_time = -55;
+	int waste_structure[2] = { -215, -355 };
+	int waste_T = -152;
 	int waste_I = -97;
 	int hold_T = 57;
 	int hold_I = 67;
-
-	void set(const std::string& file_path);
 };
 
 static std::unordered_map<piece, std::vector<std::vector<move>>> path_hd{
@@ -478,45 +479,170 @@ static std::unordered_map<piece, std::vector<std::vector<move>>> path_sd{
 	}}
 };
 
-static std::unordered_map<piece, std::vector<uint16_t>> piece_form{
+static std::unordered_map<piece, std::vector<std::vector<uint16_t>>> piece_form{
 	{PIECE_I, {
-	0b0000111100000000,
-	0b0010001000100010,
-	0b0000000011110000,
-	0b0100010001000100
+		{
+			0b0000, 
+			0b1111, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0010, 
+			0b0010, 
+			0b0010, 
+			0b0010
+		},
+		{
+			0b0000, 
+			0b0000, 
+			0b1111, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b0100, 
+			0b0100, 
+			0b0100
+		}
 	}},
 	{PIECE_J, {
-	0b1000111000000000,
-	0b0110010001000000,
-	0b0000111000100000,
-	0b0100010011000000
+		{
+			0b1000, 
+			0b1110, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0110, 
+			0b0100, 
+			0b0100, 
+			0b0000
+		},
+		{
+			0b0000, 
+			0b1110, 
+			0b0010, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b0100, 
+			0b1100, 
+			0b0000
+		}
 	}},
 	{PIECE_L, {
-	0b0010111000000000,
-	0b0100010001100000,
-	0b0000111010000000,
-	0b1100010001000000
+		{
+			0b0010, 
+			0b1110, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b0100, 
+			0b0110, 
+			0b0000
+		},
+		{
+			0b0000, 
+			0b1110, 
+			0b1000, 
+			0b0000
+		},
+		{
+			0b1100, 
+			0b0100, 
+			0b0100, 
+			0b0000
+		}
 	}},
 	{PIECE_S, {
-	0b0110110000000000,
-	0b0100011000100000,
-	0b0000011011000000,
-	0b1000110001000000
+		{
+			0b0110, 
+			0b1100, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b0110, 
+			0b0010, 
+			0b0000
+		},
+		{
+			0b0000, 
+			0b0110, 
+			0b1100, 
+			0b0000
+		},
+		{
+			0b1000, 
+			0b1100, 
+			0b0100, 
+			0b0000
+		}
 	}},
 	{PIECE_T, {
-	0b0100111000000000,
-	0b0100011001000000,
-	0b0000111001000000,
-	0b0100110001000000
+		{
+			0b0100, 
+			0b1110, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b0110, 
+			0b0100, 
+			0b0000
+		},
+		{
+			0b0000, 
+			0b1110, 
+			0b0100, 
+			0b0000
+		},
+		{
+			0b0100, 
+			0b1100, 
+			0b0100, 
+			0b0000
+		}
 	}},
 	{PIECE_Z, {
-	0b1100011000000000,
-	0b0010011001000000,
-	0b0000110001100000,
-	0b0100110010000000
+		{
+			0b1100, 
+			0b0110, 
+			0b0000, 
+			0b0000
+		},
+		{
+			0b0010,
+			0b0110,
+			0b0100,
+			0b0000
+		},
+		{
+			0b0000, 
+			0b1100,
+			0b0110,
+			0b0000
+		},
+		{
+			0b0100,
+			0b1100, 
+			0b1000, 
+			0b0000
+		}
 	}},
 	{PIECE_O, {
-	0b1100110000000000
+		{
+			0b1100,
+			0b1100,
+			0b0000, 
+			0b0000
+		}
 	}}
 };
 

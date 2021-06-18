@@ -65,19 +65,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	// Hard drop
 	for (int i = 0; i < (int)path_hd[parent.current].size(); ++i) {
 		node child;
-		//child.path = node::hard_drop_path[parent.current][i];
-		/*child.path = { parent.current , false, false, i };
-		switch (is_first_time)
-		{
-		case true:
-			child.org_path = child.path;
-			break;
-		case false:
-			child.org_path = parent.org_path;
-			break;
-		}*/
 		parent.attempt(child, false, path_hd[parent.current][i], next_queue);
-		child.path = parent.path;
+		//child.path = parent.path;
 		child.path.add((0b00 | (parent.current << 2)) | ((i & 0b11111111) << 5));
 		child.score = evaluator.evaluate(child); // replace with a good evaluator
 
@@ -88,7 +77,6 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 			if (child.score > new_beam[0].score) new_beam[0] = child;
 		}
 		else {
-			//new_beam.push_back(child);
 			new_beam.push_back(child);
 			std::push_heap(new_beam.begin(), new_beam.end());
 		}
@@ -96,15 +84,11 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	};
 
 	if (parent.hold == PIECE_NONE) {
-		//if (parent.next.size() > 0) {
 		if (parent.next < next_queue.size) {
 			for (int i = 0; i < (int)path_hd[next_queue[parent.next]].size(); ++i) {
 				node child;
-				//child.path = node::hard_drop_path[parent.next[0]][i];
-				//child.path.insert(child.path.begin(), 'C');
-				//child.path = { this->next_queue[parent.next] , true, false, i };
 				parent.attempt(child, true, path_hd[next_queue[parent.next]][i], next_queue);
-				child.path = parent.path;
+				//child.path = parent.path;
 				child.path.add((0b01 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
 				child.score = evaluator.evaluate(child); // replace with a good evaluator
 
@@ -112,11 +96,9 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 				if (is_last_beam) {
 					if ((int)new_beam.size() < 1) new_beam.push_back(child);
-					//if (new_beam.size() < 1) new_beam.push_back(child);
 					if (child.score > new_beam[0].score) new_beam[0] = child;
 				}
 				else {
-					//new_beam.push_back(child);
 					new_beam.push_back(child);
 					std::push_heap(new_beam.begin(), new_beam.end());
 				}
@@ -127,11 +109,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	else {
 		for (int i = 0; i < (int)path_hd[parent.hold].size(); ++i) {
 			node child;
-			//child.path = node::hard_drop_path[parent.hold][i];
-			//child.path.insert(child.path.begin(), 'C');
-			//child.path = { parent.hold , true, false, i };
 			parent.attempt(child, true, path_hd[parent.hold][i], next_queue);
-			child.path = parent.path;
+			//child.path = parent.path;
 			child.path.add((0b01 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
 			child.score = evaluator.evaluate(child); // replace with a good evaluator
 
@@ -139,12 +118,10 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 			if (is_last_beam) {
 				if ((int)new_beam.size() < 1) new_beam.push_back(child);
-				//if (new_beam.size() < 1) new_beam.push_back(child);
 				if (child.score > new_beam[0].score) new_beam[0] = child;
 			}
 			else {
 				new_beam.push_back(child);
-				//new_beam.push_back(child);
 				std::push_heap(new_beam.begin(), new_beam.end());
 			}
 			++node_count;
@@ -154,10 +131,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	// Soft drop
 	for (int i = 0; i < (int)path_sd[parent.current].size(); ++i) {
 		node child;
-		//child.path = node::soft_drop_path[parent.current][i];
-		//child.path = { parent.current , false, true, i };
 		parent.attempt(child, false, path_sd[parent.current][i], next_queue);
-		child.path = parent.path;
+		//child.path = parent.path;
 		child.path.add((0b10 | (parent.current << 2)) | ((i & 0b11111111) << 5));
 
 		// check if existing
@@ -176,12 +151,10 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 			if (is_last_beam) {
 				if ((int)new_beam.size() < 1) new_beam.push_back(child);
-				//if (new_beam.size() < 1) new_beam.push_back(child);
 				if (child.score > new_beam[0].score) new_beam[0] = child;
 			}
 			else {
 				new_beam.push_back(child);
-				//new_beam.push_back(child);
 				std::push_heap(new_beam.begin(), new_beam.end());
 			}
 			++node_count;
@@ -192,11 +165,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 		if (parent.next < next_queue.size) {
 			for (int i = 0; i < (int)path_sd[next_queue[parent.next]].size(); ++i) {
 				node child;
-				//child.path = node::soft_drop_path[parent.next[0]][i];
-				//child.path.insert(child.path.begin(), 'C');
-				//child.path = { this->next_queue[parent.next] , true, true, i };
 				parent.attempt(child, true, path_sd[next_queue[parent.next]][i], next_queue);
-				child.path = parent.path;
+				//child.path = parent.path;
 				child.path.add((0b11 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
 
 				// check if existing
@@ -215,12 +185,10 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 					if (is_last_beam) {
 						if ((int)new_beam.size() < 1) new_beam.push_back(child);
-						//if (new_beam.size() < 1) new_beam.push_back(child);
 						if (child.score > new_beam[0].score) new_beam[0] = child;
 					}
 					else {
 						new_beam.push_back(child);
-						//new_beam.push_back(child);
 						std::push_heap(new_beam.begin(), new_beam.end());
 					}
 					++node_count;
@@ -231,11 +199,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	else {
 		for (int i = 0; i < (int)path_sd[parent.hold].size(); ++i) {
 			node child;
-			//child.path = node::soft_drop_path[parent.hold][i];
-			//child.path.insert(child.path.begin(), 'C');
-			//child.path = { parent.hold , true, true, i };
 			parent.attempt(child, true, path_sd[parent.hold][i], next_queue);
-			child.path = parent.path;
+			//child.path = parent.path;
 			child.path.add((0b11 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
 
 			// check if existing
@@ -254,12 +219,10 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 				if (is_last_beam) {
 					if ((int)new_beam.size() < 1) new_beam.push_back(child);
-					//if (new_beam.size() < 1) new_beam.push_back(child);
 					if (child.score > new_beam[0].score) new_beam[0] = child;
 				}
 				else {
 					new_beam.push_back(child);
-					//new_beam.push_back(child);
 					std::push_heap(new_beam.begin(), new_beam.end());
 				}
 				++node_count;
@@ -275,10 +238,30 @@ void beam::expand(std::vector<node>& pre_beam, std::vector<node>& new_beam, cons
 		if (pre_beam.size() < 1) {
 			break;
 		}
-		this->expand_node(pre_beam[0], pre_beam, new_beam, beam_width, is_fisrt_time, is_last_beam, node_count);
+		expand_node(pre_beam[0], pre_beam, new_beam, beam_width, is_fisrt_time, is_last_beam, node_count);
 
 		std::pop_heap(pre_beam.begin(), pre_beam.end());
 		pre_beam.pop_back();
+	}
+}
+
+void beam::reconstuct_from_memory(int & iter_num, int & stack_index, int & node_count)
+{
+	if (memory.size > 0) {
+		node rebuild_node = stack[0][0];
+		for (int i = 0; i < memory.size; ++i) {
+			node temp_node;
+			if ((memory[i] & 0b10) == 0b10) { // if soft drop
+				rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_sd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
+			}
+			else {
+				rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_hd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
+			}
+			rebuild_node = temp_node;
+		}
+		rebuild_node.path = memory;
+		stack[memory.size].push_back(rebuild_node);
+		expand(stack[memory.size], stack[memory.size + 1], 1, false, (memory.size == depth - 1), node_count);
 	}
 }
 
@@ -303,31 +286,10 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 
 	if (iter_num == 0) {
 		// forced search from memory
-		if (memory.size > 0) {
-			node rebuild_node = stack[0][0];
-			for (int i = 0; i < memory.size; ++i) {
-				node temp_node;
-				if ((memory[i] & 0b10) == 0b10) { // if soft drop
-					rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_sd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
-				}
-				else {
-					rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_hd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
-				}
-				rebuild_node = temp_node;
-			}
-			rebuild_node.path = memory;
-			/*
-			int rebuild_score = evaluator.evaluate(rebuild_node);
-			rebuild_node.score = rebuild_score + rebuild_score * (rand() % 15 + 5) / 100;*/
-			stack[memory.size].push_back(rebuild_node);
-			beam::expand(stack[memory.size], stack[memory.size + 1], 1, false, (memory.size == depth - 1), node_count);
-			/*for (auto & child_node : stack[memory.size + 1]) {
-				child_node.score += abs(child_node.score) * (rand() % 5 + 5) / 100;
-			}//*/
-		}
+		reconstuct_from_memory(iter_num, stack_index, node_count);
 
 		// level 1 search
-		beam::expand(stack[0], stack[1], 1, true, false, node_count);
+		expand(stack[0], stack[1], 1, true, false, node_count);
 		stack_index = 0;
 	}
 	else {
@@ -353,7 +315,7 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 			}
 		}
 
-		beam::expand(this->stack[stack_index], this->stack[stack_index + 1], s_width, false, (stack_index == depth - 1), node_count);
+		expand(this->stack[stack_index], this->stack[stack_index + 1], s_width, false, (stack_index == depth - 1), node_count);
 	}
 }
 

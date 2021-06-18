@@ -59,7 +59,9 @@ inline bool bitboard::is_occupying(int x, int y) {
 inline bool bitboard::is_colliding(bitpiece & piece, int x, int y)
 {
 	for (int i = 0; i < 4; ++i) {
-		uint16_t piece_chunk = (piece_form[piece.type][piece.current_form] >> (4 * (3 - i))) & 0b1111;
+		/*
+		//uint16_t piece_chunk = (piece_form[piece.type][piece.current_form] >> (4 * (3 - i))) & 0b1111;
+		uint16_t piece_chunk = piece_form[piece.type][piece.current_form][i];
 
 		if (i + y > 39) {
 			if (piece_chunk != 0b0) return true;
@@ -72,6 +74,20 @@ inline bool bitboard::is_colliding(bitpiece & piece, int x, int y)
 				piece_chunk = piece_chunk << 9 >> x;
 			if (board_chunk & piece_chunk)
 				return true;
+		}*/
+
+		if (i + y > 39) {
+			if (piece_form[piece.type][piece.current_form][i] != 0b0) return true;
+		}
+		else {
+			if (x < 0) {
+				if (((row[i + y] << 3) | 0b1110000000000111) & (piece_form[piece.type][piece.current_form][i] << 9 << -x))
+					return true;
+			}
+			else {
+				if (((row[i + y] << 3) | 0b1110000000000111) & (piece_form[piece.type][piece.current_form][i] << 9 >> x))
+					return true;
+			}
 		}
 	}
 	return false;
@@ -98,7 +114,8 @@ inline bool bitboard::t_spin(bitpiece& piece) {
 inline void bitboard::place_piece(bitpiece & piece)
 {
 	for (int i = 0; i < 4; ++i) {
-		uint16_t piece_chunk = (piece_form[piece.type][piece.current_form] >> (4 * (3 - i))) & 0b1111;
+		//uint16_t piece_chunk = (piece_form[piece.type][piece.current_form] >> (4 * (3 - i))) & 0b1111;
+		uint16_t piece_chunk = piece_form[piece.type][piece.current_form][i];
 		if (piece.x < 0)
 			row[i + piece.y] = (row[i + piece.y] | ((piece_chunk << 6) << -piece.x)) & 0b1111111111;
 		else

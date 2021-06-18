@@ -2,6 +2,10 @@
 
 void node::attempt(node & child, bool hold, const std::vector<move>& path, vec16<piece>& next_queue)
 {
+	child = *this;
+	child.score = 0;
+	++child.depth;
+	/*
 	child.board = this->board;
 	child.current = this->current;
 	child.hold = this->hold;
@@ -25,7 +29,7 @@ void node::attempt(node & child, bool hold, const std::vector<move>& path, vec16
 	child.I_wasted = this->I_wasted;
 	child.time_wasted = this->time_wasted;
 	child.t_struct_wasted[0] = this->t_struct_wasted[0];
-	child.t_struct_wasted[1] = this->t_struct_wasted[1];
+	child.t_struct_wasted[1] = this->t_struct_wasted[1];*/
 
 	bitpiece s_piece;
 	if (hold) {

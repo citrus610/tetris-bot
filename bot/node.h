@@ -29,21 +29,12 @@ struct node
 	int I_wasted = 0;
 	int time_wasted = 0;
 
-	/*
-	int struct_tsd = 0;
-	int struct_stsd = 0;
-	int struct_tst = 0;
-	int p_struct_tsd = 0;
-	int p_struct_stsd = 0;
-	int p_struct_tst = 0; // "p" stand for parent, we store the previous struct count for evaluation
-	int struct_tsd_wasted = 0;
-	int struct_tsd_wasted = 0;
-	int struct_tsd_wasted = 0;*/
 	int t_struct[2] = { 0, 0 };
 	int p_t_struct[2] = { 0, 0 };
 	int t_struct_wasted[2] = { 0, 0 };
 
 	int score = 0;
+	int depth = 0;
 	vec16<int> path; // the path lead to this node
 
 	bool operator < (const node& other) {
