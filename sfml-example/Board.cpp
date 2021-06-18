@@ -129,6 +129,7 @@ void Tetris::Board::init()
 	this->total_tetris = 0;
 
 	this->bot_node_count = 0;
+	this->bot_depth = 0;
 }
 
 void Tetris::Board::setEnemy(Board* _enemy)
@@ -524,6 +525,7 @@ void Tetris::Board::render(sf::RenderTexture* _canvas)
 	this->decor[6].position = sf::Vector2f(this->x + this->sprite.getScale().x * 16 - 8, this->y + this->sprite.getScale().x * 20);
 	this->decor[7].position = sf::Vector2f(this->x + this->sprite.getScale().x * 15 + 8, this->y + this->sprite.getScale().x * 20);
 
+	//this->text.setString("nodes: \n" + std::to_string(this->bot_node_count / 6 * 5) + "\n" + "depth: \n" + std::to_string(this->bot_depth));
 	this->text.setString("nodes: \n" + std::to_string(this->bot_node_count) + "\n" + "depth: \n" + std::to_string(this->bot_depth));
 
 	this->renderData();
