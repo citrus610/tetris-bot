@@ -13,6 +13,7 @@ Game::~Game()
 void Game::start()
 {
 	this->window = new sf::RenderWindow(sf::VideoMode(960, 540), "TETRIS");
+	//this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "TETRIS");
 	this->canvas.create(1920, 1080);
 	this->window->setKeyRepeatEnabled(true);
 
@@ -24,7 +25,7 @@ void Game::start()
 	{
 		this->pollEvent();
 		this->deltaTime = clock.restart().asSeconds();
-		this->update(this->deltaTime);
+		this->update(this->deltaTime / 1.0f);
 		this->window->clear();
 		this->render(); // user's function
 		this->canvas.display();

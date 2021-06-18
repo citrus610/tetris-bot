@@ -28,7 +28,7 @@ void Game1::load()
 	if (this->is_1_bot) {
 		this->board1.enableAI();
 		///*
-		this->bot_1.thread_start(7, this->w_1);
+		this->bot_1.thread_start(5, this->w_1, true);
 
 		bot_data data_1;
 		data_1.current = char_to_piece(this->board1.currentPiece);
@@ -48,7 +48,7 @@ void Game1::load()
 	if (this->is_2_bot) {
 		this->board2.enableAI();
 		///*
-		this->bot_2.thread_start(7, this->w_2);
+		this->bot_2.thread_start(5, this->w_2, true);
 
 		bot_data data_2;
 		data_2.current = char_to_piece(this->board2.currentPiece);
@@ -179,6 +179,9 @@ void Game1::update(float dt)
 
 				this->bot_1.set_new_data(new_data);
 
+				this->board1.bot_node_count = solution.node_count;
+				this->board1.bot_depth = solution.depth;
+				//std::cout << "bot 1 " << solution.node_count << std::endl;
 			}//*/
 
 			if (this->solution_index_1 < (int)this->last_solution_1.size() && this->need_new_solution_1 == false) {
@@ -294,6 +297,9 @@ void Game1::update(float dt)
 
 				this->bot_2.set_new_data(new_data);
 				
+				this->board2.bot_node_count = solution.node_count;
+				this->board2.bot_depth = solution.depth;
+				//std::cout << "bot 2 " << solution.node_count << std::endl;
 			}//*/
 
 			if (this->solution_index_2 < (int)this->last_solution_2.size() && this->need_new_solution_2 == false) {

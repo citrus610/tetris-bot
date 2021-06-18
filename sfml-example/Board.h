@@ -60,8 +60,8 @@ namespace Tetris {
 		int total_t_clear = 0;
 		int total_tetris = 0;
 
-		sf::SoundBuffer sound_clear;
-		sf::Sound sound;
+		int bot_node_count = 0;
+		int bot_depth = 0;
 	private:
 		Board *enemy = nullptr;
 
@@ -85,6 +85,12 @@ namespace Tetris {
 		sf::Texture image_of_pieces;
 		sf::Sprite sprite_image_of_pieces;
 		std::unordered_map<char, int> pos_of_piece_in_image;
+
+		sf::SoundBuffer sound_clear;
+		sf::Sound sound;
+
+		sf::Font font;
+		sf::Text text;
 	};
 
 };

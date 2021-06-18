@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../bot/bot.h"
-#include "../optimizer/optimizer.h"
 
 static piece char_to_piece(char type) {
 	switch (type)
@@ -52,8 +51,8 @@ static void set_weight_js(weight & w, json js, int player) {
 	w.well_2_9 = js[plr]["well_2_9"];
 	w.well_3_8 = js[plr]["well_3_8"];
 	w.well_center = js[plr]["well_center"];
-	for (int i = 0; i < 3; ++i) {
-		w.structure[0] = js[plr]["structure"][0];
+	for (int i = 0; i < 2; ++i) {
+		w.structure[i] = js[plr]["structure"][i];
 	}
 	w.b2b_max_chain = js[plr]["b2b_max_chain"];
 	w.ren_max_chain = js[plr]["ren_max_chain"];

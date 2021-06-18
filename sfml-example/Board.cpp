@@ -4,7 +4,14 @@
 Tetris::Board::Board()
 {
 	this->sound_clear.loadFromFile("Content/Audio/clear.wav");
-	this->sound.setVolume(20.f);
+	//this->sound.setVolume(20.f);
+	this->sound.setVolume(0.f);
+
+	this->font.loadFromFile("Content/Font/arial.ttf");
+	this->text.setFont(this->font);
+	this->text.setLineSpacing(1.25f);
+	this->text.setCharacterSize(28);
+	this->text.setFillColor(sf::Color::White);
 }
 
 void Tetris::Board::init()
@@ -28,6 +35,8 @@ void Tetris::Board::init()
 	this->changePiece();
 
 	// graphic stuffs
+	this->text.setPosition(this->x + 16, this->y + this->sprite.getScale().x * 4 + 16);
+
 	texture.create(20, 20);
 	this->quads = sf::VertexArray(sf::Quads);
 	// 0, 0, 0, 0
@@ -118,6 +127,8 @@ void Tetris::Board::init()
 	this->total_line_sent = 0;
 	this->total_t_clear = 0;
 	this->total_tetris = 0;
+
+	this->bot_node_count = 0;
 }
 
 void Tetris::Board::setEnemy(Board* _enemy)
@@ -513,11 +524,14 @@ void Tetris::Board::render(sf::RenderTexture* _canvas)
 	this->decor[6].position = sf::Vector2f(this->x + this->sprite.getScale().x * 16 - 8, this->y + this->sprite.getScale().x * 20);
 	this->decor[7].position = sf::Vector2f(this->x + this->sprite.getScale().x * 15 + 8, this->y + this->sprite.getScale().x * 20);
 
+	this->text.setString("nodes: \n" + std::to_string(this->bot_node_count) + "\n" + "depth: \n" + std::to_string(this->bot_depth));
+
 	this->renderData();
 	const sf::Texture& texture = this->texture.getTexture();
 	this->sprite.setTexture(texture);
 	_canvas->draw(this->sprite, sf::RenderStates(sf::BlendAdd));
 	_canvas->draw(this->decor, sf::RenderStates(sf::BlendAdd));
+	_canvas->draw(this->text);
 }
 
 std::string Tetris::Board::encodeData(std::array<std::array<int, 10>, 40> board_data)

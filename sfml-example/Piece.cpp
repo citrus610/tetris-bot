@@ -177,7 +177,8 @@ Tetris::Piece::Piece()
 
 	this->sound_place.loadFromFile("Content/Audio/place.wav");
 	this->sound_move.loadFromFile("Content/Audio/move.wav");
-	this->sound.setVolume(5.0f);
+	//this->sound.setVolume(5.0f);
+	this->sound.setVolume(0.0f);
 }
 
 void Tetris::Piece::setType(char type)
