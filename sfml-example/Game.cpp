@@ -16,6 +16,7 @@ void Game::start()
 	//this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "TETRIS");
 	this->canvas.create(1920, 1080);
 	this->window->setKeyRepeatEnabled(true);
+	this->window->setVerticalSyncEnabled(true);
 
 	this->running = true;
 
