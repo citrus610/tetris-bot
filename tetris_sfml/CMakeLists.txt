@@ -8,8 +8,8 @@ set(SFML_STATIC_LIBRARIES TRUE)
 
 ## set sfml direcory
 # example:
-set(SFML_DIR "F:/SFML-2.5.1/lib/cmake/SFML")
-# set(SFML_DIR "<insert-your-sfml-dir-here>/lib/cmake/SFML")
+# set(SFML_DIR "F:/SFML-2.5.1/lib/cmake/SFML")
+set(SFML_DIR "<insert-your-sfml-dir-here>/lib/cmake/SFML")
 
 find_package(SFML 2.5 COMPONENTS graphics window audio network system)
 
