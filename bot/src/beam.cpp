@@ -7,7 +7,8 @@ beam::beam(int depth, int width)
 	this->stack.reserve(this->depth + 1);
 	for (int i = 0; i < this->depth + 1; i++) {
 		this->stack.push_back(std::vector<node>());
-		this->stack[i].reserve(16000);
+		if (i != 0) this->stack[i].reserve(32000);
+		//this->stack[i].reserve(16000);
 	}
 	node root;
 	this->stack[0].push_back(root);
@@ -19,16 +20,13 @@ beam::beam(int depth)
 	this->stack.reserve(this->depth + 1);
 	for (int i = 0; i < this->depth + 1; i++) {
 		this->stack.push_back(std::vector<node>());
-		this->stack[i].reserve(16000);
+		if (i != 0) this->stack[i].reserve(32000);
+		//this->stack[i].reserve(16000);
 	}
 	node root;
 	this->stack[0].push_back(root);
 }
 
-/*
-Reset the beam while keeping the path led to the best node in previous search
-Maybe this will improve beam search? idk
-*/
 void beam::reset(bool keep_memory)
 {
 	if (keep_memory) {
@@ -44,11 +42,11 @@ void beam::reset(bool keep_memory)
 		}
 	}
 	
-	this->stack.clear();
-	this->stack.reserve(this->depth + 1);
-	for (int i = 0; i < this->depth + 1; i++) {
-		this->stack.push_back(std::vector<node>());
-		this->stack[i].reserve(16000);
+	//this->stack.clear();
+	//this->stack.reserve(this->depth + 1);
+	for (int i = 0; i < this->depth + 1; ++i) {
+		this->stack[i].clear();
+		//this->stack[i].reserve(16000);
 	}
 	node root;
 	this->stack[0].push_back(root);
@@ -245,6 +243,10 @@ void beam::expand(std::vector<node>& pre_beam, std::vector<node>& new_beam, cons
 	}
 }
 
+/*
+Reset the beam while keeping the path led to the best node in previous search
+Maybe this will improve beam search? idk
+*/
 void beam::reconstuct_from_memory(int & iter_num, int & stack_index, int & node_count)
 {
 	if (memory.size > 0) {
