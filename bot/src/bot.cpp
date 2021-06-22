@@ -15,7 +15,7 @@ void bot::thread_start(int depth, weight w, bool memory)
 		a.evaluator.w = bot_weight;
 
 		int solution = 0b1111111111111111; // garbage random
-		/*
+		///*
 		while (true)
 		{
 			a.search_one_iter(iter_num, stack_index, node_count);
@@ -69,8 +69,8 @@ void bot::thread_start(int depth, weight w, bool memory)
 				break;
 			}
 		}
-		*/
-
+		//*/
+		/*
 		while (true)
 		{
 			a.search_one_iter(iter_num, stack_index, node_count);
@@ -119,11 +119,13 @@ void bot::thread_start(int depth, weight w, bool memory)
 				new_data_buffer.clear();
 				solution_buffer.clear();
 				solution_ready = false;
+				solution_need = false;
 			}
 			if (!running) {
 				break;
 			}
 		}
+		//*/
 	}, depth, w, memory);
 }
 
@@ -142,12 +144,14 @@ void bot::thread_destroy()
 
 path_data bot::request_solution()
 {
-	/*
+	///*
 	std::unique_lock<std::mutex> lk(mutex);
 	cv.wait(lk, [&]() { return solution_ready; });
 	path_data result = solution_buffer[0];
 	solution_buffer.clear();
-	return result;*/
+	return result;//*/
+
+	/*
 	std::unique_lock<std::mutex> lk(mutex);
 	solution_need = true;
 	lk.unlock();
@@ -155,11 +159,13 @@ path_data bot::request_solution()
 	cv.wait(lk, [&]() { return solution_ready; });
 	path_data result = solution_buffer[0];
 	solution_buffer.clear();
-	return result;
+	solution_ready = false;
+	return result;//*/
 }
 
 void bot::set_new_data(bot_data new_data)
 {
 	std::unique_lock<std::mutex> lk(mutex);
 	new_data_buffer.push_back(new_data);
+	lk.unlock();
 }
