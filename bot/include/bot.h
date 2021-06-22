@@ -17,7 +17,7 @@ class bot
 	//public:
 	std::mutex mutex;
 	std::condition_variable cv;
-	bool solution_ready = false, running = true; // Set before starting std::thread
+	bool solution_ready = false, solution_need = false, running = true; // Set before starting std::thread
 	std::vector<bot_data> new_data_buffer;
 	std::vector<path_data> solution_buffer;
 
