@@ -306,6 +306,7 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 			s_width = width[0];
 			stack_index++;
 			if (stack_index >= depth) {
+				/*
 				stack_index = depth - 1;
 				while (stack[stack_index].size() < 1)
 				{
@@ -315,7 +316,18 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 				}
 				if (stack_index == 0)
 					return;
+				//*/
+
+				///*
+				stack_index = 1;
+				while (stack[stack_index].empty())
+				{
+					++stack_index;
+				}
+				if (stack_index >= depth)
+					return;//*/
 			}
+
 		}
 
 		expand(this->stack[stack_index], this->stack[stack_index + 1], s_width, false, (stack_index == depth - 1), node_count);
