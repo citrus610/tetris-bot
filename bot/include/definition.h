@@ -70,6 +70,7 @@ struct weight {
 	int top_height = -34;
 	int top_height_top_half = -150;
 	int top_height_top_quarter = -671;
+	int top_height_center = -47;
 	int bumpiness = -26;
 	int bumpiness_s = -6;
 	int well = 70;

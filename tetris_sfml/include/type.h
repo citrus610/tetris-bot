@@ -57,6 +57,7 @@ static void create_init_js() {
 		j_file[std::to_string(i)]["top_height"] = w.top_height;
 		j_file[std::to_string(i)]["top_height_top_half"] = w.top_height_top_half;
 		j_file[std::to_string(i)]["top_height_top_quarter"] = w.top_height_top_quarter;
+		j_file[std::to_string(i)]["top_height_center"] = w.top_height_center;
 		j_file[std::to_string(i)]["bumpiness"] = w.bumpiness;
 		j_file[std::to_string(i)]["bumpiness_s"] = w.bumpiness_s;
 		j_file[std::to_string(i)]["well"] = w.well;
@@ -108,6 +109,7 @@ static void set_weight_js(weight & w, json js, int player) {
 	w.top_height = js[plr]["top_height"];
 	w.top_height_top_half = js[plr]["top_height_top_half"];
 	w.top_height_top_quarter = js[plr]["top_height_top_quarter"];
+	w.top_height_center = js[plr]["top_height_center"];
 	w.bumpiness = js[plr]["bumpiness"];
 	w.bumpiness_s = js[plr]["bumpiness_s"];
 	w.well = js[plr]["well"];

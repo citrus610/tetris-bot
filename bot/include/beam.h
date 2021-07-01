@@ -14,7 +14,7 @@ public:
 	int depth;
 	int width[16] = { 50, 150, 150, 150, 150, 150, 150, 150, 150, 175, 175, 175, 175, 200, 200, 200 };
 	const int max_mem = 32000;
-	int prune = 2500;
+	int prune = 4000;
 	vec16<piece> next_queue;
 	vec16<int> memory;
 	std::vector<std::vector<node>> stack;

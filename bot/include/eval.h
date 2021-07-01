@@ -13,7 +13,7 @@ struct eval
 	void bumpiness(int column_height[10], int result[2]);
 	void blocked_cell_hole(bitboard& board, int column_height[10], int result[2]);
 	void block_above_hole(bitboard& board, int column_height[10], int result[2]);
-	void structure(bitboard& board, int column_height[10], int result[2]);
+	void structure(bitboard& board, int column_height[10], int max_height, int result[2]);
 };
 
 inline int eval::evaluate(node & node)
@@ -24,14 +24,17 @@ inline int eval::evaluate(node & node)
 	this->column_height(node.board, column_height);
 
 	int highest_height = column_height[0];
+	int highest_height_index = 0;
 	int well_index = 0;
 	int well_depth = 0;
 
 	for (int i = 0; i < 10; i++) {
 
 		// highest height
-		if (column_height[i] > highest_height)
+		if (column_height[i] > highest_height) {
 			highest_height = column_height[i];
+			highest_height_index = i;
+		}
 
 		// well - lowest column height
 		if (column_height[i] <= column_height[well_index])
@@ -49,6 +52,7 @@ inline int eval::evaluate(node & node)
 	result += highest_height * w.top_height;
 	result += std::max(highest_height - 10, 0) * w.top_height_top_half;
 	result += std::max(highest_height - 15, 0) * w.top_height_top_half;
+	result += (highest_height_index > 2 && highest_height_index < 7) * w.top_height_center;
 
 	// well depth
 	uint16_t well_row_struct = 0b1111111111 & ~(0b1 << (9 - well_index));
@@ -94,7 +98,7 @@ inline int eval::evaluate(node & node)
 	result += bumpiness[0] * w.bumpiness + bumpiness[1] * w.bumpiness_s;
 
 	// structure
-	this->structure(node.board, column_height, node.t_struct);
+	this->structure(node.board, column_height, highest_height, node.t_struct);
 	result += node.t_struct[0] * w.structure[0] + node.t_struct[1] * w.structure[1];
 
 	// waste structure
@@ -146,18 +150,16 @@ inline int eval::evaluate(node & node)
 
 	// waste time
 	// DEFINITION: Time is wasted if softdrop a non-t piece, soft drop t piece without t spin, or burn lines
-	int time_waste = 0;
 	if ((node.path[node.path.size - 1] & 0b10) == 0b10) {
 		// if just soft drop, but wasn't a t spin then wasted time
 		if (node.lock != LOCK_TSPIN_1 && node.lock != LOCK_TSPIN_2 && node.lock != LOCK_TSPIN_3 && node.lock != LOCK_PC) {
-			time_waste++;
+			++node.time_wasted;
 		}
 	}
 	if (node.lock == LOCK_BURN_1 || node.lock == LOCK_BURN_2 || node.lock == LOCK_BURN_3) {
 		// if just cleared lines, but wasn't a t spin or tetris or perfect clear, then time was wasted
-		time_waste++;
+		++node.time_wasted;
 	}
-	node.time_wasted += time_waste;
 	result += node.time_wasted * w.waste_time;
 
 	// waste piece
@@ -235,7 +237,7 @@ inline void eval::block_above_hole(bitboard& board, int column_height[10], int r
 	}
 }
 
-inline void eval::structure(bitboard& board, int column_height[10], int result[2])
+inline void eval::structure(bitboard& board, int column_height[10], int max_height, int result[2])
 {
 
 	/*
@@ -290,12 +292,6 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 	result[0] = 0;
 	result[1] = 0;
 
-	int max_height = 0;
-	for (int i = 0; i < 10; ++i) {
-		if (column_height[i] > max_height)
-			max_height = column_height[i];
-	}
-
 	for (int x = 0; x < 8; ++x) {
 	//for (int y = 40 - max_height; y < 38; ++y) {
 		for (int y = 40 - max_height; y < 38; ++y) {
@@ -312,7 +308,8 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 					((board.row[y + 2] >> (7 - x)) & 0b111) == 0b101 &&
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
-				result[0]++;
+				++result[0];
+				x += 2;
 				break;
 			}
 
@@ -333,7 +330,8 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 					((board.row[y + 4] >> (7 - x)) & 0b001) == 0b000 &&
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
-					result[1]++;
+					++result[1];
+					x += 2;
 					break;
 				}
 			}

@@ -157,7 +157,7 @@ inline int bitboard::line_sent(int line_cleared, bool t_spin, int& b2b, int& ren
 		case 4:
 			garbage = 4;
 			if (b2b > 0)
-				garbage++;
+				++garbage;
 			++b2b;
 			break;
 		default:
