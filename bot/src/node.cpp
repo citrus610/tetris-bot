@@ -3,6 +3,8 @@
 void node::attempt(node & child, bool hold, const std::vector<move>& path, vec16<piece>& next_queue)
 {
 	child = *this;
+	child.p_t_struct[0] = this->t_struct[0];
+	child.p_t_struct[1] = this->t_struct[1];
 	child.score = 0;
 
 	bitpiece s_piece;

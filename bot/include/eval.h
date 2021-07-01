@@ -296,8 +296,10 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 			max_height = column_height[i];
 	}
 
-	for (int y = 40 - max_height; y < 38; ++y) {
-		for (int x = 0; y < 8; ++y) {
+	for (int x = 0; x < 8; ++x) {
+	//for (int y = 40 - max_height; y < 38; ++y) {
+		for (int y = 40 - max_height; y < 38; ++y) {
+		//for (int x = 0; x < 8; ++x) {
 			// TSD
 			if ((
 				((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
@@ -311,46 +313,11 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
 				result[0]++;
+				break;
 			}
 
 			// STSD & TST
 			if (y < 36) {
-				/*
-				if ((
-					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
-					((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
-					((board.row[y + 2] >> (7 - x)) & 0b111) == 0b011 &&
-					((board.row[y + 3] >> (7 - x)) & 0b111) == 0b001 &&
-					((board.row[y + 4] >> (7 - x)) & 0b111) == 0b001 &&
-					column_height[x + 1] < 40 - y && column_height[x + 2] < 40 - y
-					) || (
-					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b001 &&
-						((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
-						((board.row[y + 2] >> (7 - x)) & 0b111) == 0b110 &&
-						((board.row[y + 3] >> (7 - x)) & 0b111) == 0b100 &&
-						((board.row[y + 4] >> (7 - x)) & 0b111) == 0b100 &&
-						column_height[x] < 40 - y && column_height[x + 1] < 40 - y
-						)) {
-					result[1]++;
-				}
-				else
-					if ((
-						((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
-						((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
-						((board.row[y + 2] >> (7 - x)) & 0b111) == 0b011 &&
-						((board.row[y + 3] >> (7 - x)) & 0b111) == 0b001 &&
-						((board.row[y + 4] >> (7 - x)) & 0b111) == 0b011 &&
-						column_height[x + 1] < 40 - y && column_height[x + 2] < 40 - y
-						) || (
-						((board.row[y + 0] >> (7 - x)) & 0b111) == 0b001 &&
-							((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
-							((board.row[y + 2] >> (7 - x)) & 0b111) == 0b110 &&
-							((board.row[y + 3] >> (7 - x)) & 0b111) == 0b100 &&
-							((board.row[y + 4] >> (7 - x)) & 0b111) == 0b110 &&
-							column_height[x] < 40 - y && column_height[x + 1] < 40 - y
-							)) {
-						result[2]++;
-				}*/
 				if ((
 					((board.row[y + 0] >> (7 - x)) & 0b111) == 0b100 &&
 					((board.row[y + 1] >> (7 - x)) & 0b111) == 0b000 &&
@@ -367,6 +334,7 @@ inline void eval::structure(bitboard& board, int column_height[10], int result[2
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
 					result[1]++;
+					break;
 				}
 			}
 		}
