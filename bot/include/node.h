@@ -35,13 +35,34 @@ struct node
 	int t_struct_wasted[2] = { 0, 0 };
 
 	int score = 0;
-	vec16<int> path; // the path lead to this node
+	int path = -1;
+	int org_path = -1;
 
-	bool operator < (const node& other) {
-		return this->score < other.score;
+	bool operator < (const node& other) { return this->score < other.score; }
+	void attempt(node& child, bool hold, const std::vector<move> & path, vec16<piece> & next_queue);
+};
+
+struct reward {
+	int visit = 0;
+	int score = 0;
+
+	bool operator < (const reward & other) {
+		if (this->visit == other.visit) {
+			return this->score < other.score;
+		}
+		else {
+			return this->visit < other.visit;
+		}
 	}
 
-	void attempt(node& child, bool hold, const std::vector<move> & path, vec16<piece> & next_queue);
+	bool operator > (const reward & other) {
+		if (this->visit == other.visit) {
+			return this->score > other.score;
+		}
+		else {
+			return this->visit > other.visit;
+		}
+	}
 };
 
 #endif

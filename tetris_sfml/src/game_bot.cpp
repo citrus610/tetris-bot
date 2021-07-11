@@ -83,13 +83,13 @@ void game_bot::start_game()
 	this->board_2.init();
 
 	if (this->enable_bot_1) {
-		this->bot_1.thread_start(5, this->w_1, true);
+		this->bot_1.thread_start(5, this->w_1);
 		bot_data data_1 = board_to_bot_data(this->board_1);
 		this->bot_1.set_new_data(data_1);
 	}
 
 	if (this->enable_bot_2) {
-		this->bot_2.thread_start(5, this->w_2, true);
+		this->bot_2.thread_start(5, this->w_2);
 		bot_data data_2 = board_to_bot_data(this->board_2);
 		this->bot_2.set_new_data(data_2);
 	}
@@ -99,97 +99,6 @@ void game_bot::update_game(double dt)
 {
 	if (this->enable_bot_1) this->handle_bot_input(dt, 1, this->board_1, this->bot_1, this->bot_input_timer_1, this->solution_1);
 	if (this->enable_bot_2) this->handle_bot_input(dt, 2, this->board_2, this->bot_2, this->bot_input_timer_2, this->solution_2);
-	/*if (!this->board_1.is_clearing_line() && !this->board_1.is_placing_piece()) {
-		if (this->solution_1.empty()) {
-			path_data solution = this->bot_1.request_solution();
-			if (solution.is_hold) this->board_1.hold();
-			if (solution.is_soft_drop)
-				this->solution_1 = path_sd[solution.type][solution.index]; // out of range
-			else
-				this->solution_1 = path_hd[solution.type][solution.index]; // out of range
-
-			vec16<piece> next_q;
-			next_q.size = 0;
-			for (int i = 0; i < (int)this->board_1.next_piece.size(); ++i)
-				next_q.add(char_to_piece(this->board_1.next_piece[i]));
-
-			node old_n, new_n;
-
-			//old_n = board_to_node(_board);
-			old_n.current = char_to_piece(this->board_1.current_piece);
-			old_n.hold = char_to_piece(this->board_1.hold_piece);
-			old_n.b2b = this->board_1.b2b;
-			old_n.ren = this->board_1.ren;
-			old_n.next = 0;
-			for (int i = 0; i < 40; ++i) {
-				uint16_t a_row = 0b0;
-				for (int k = 0; k < 10; ++k) {
-					if (this->board_1.data[i][k] > 0) {
-						a_row = a_row | (0b1 << (9 - k));
-					}
-				}
-				old_n.board.row[i] = a_row;
-			}
-
-			old_n.attempt(new_n, false, this->solution_1, next_q);
-			next_q.erase(0);
-			bot_data new_data{ new_n.board, new_n.current, new_n.hold, next_q, new_n.b2b, new_n.ren };
-
-			this->bot_1.set_new_data(new_data);
-
-			this->bot_input_timer_1 = 0.0;
-			this->board_1.bot_node = solution.node_count;
-			this->board_1.bot_depth = solution.depth;
-		}
-		else {
-			this->bot_input_timer_1 += dt;
-			switch (this->solution_1[0])
-			{
-			case MOVE_CW:
-				this->board_1.real_piece.try_rotate(this->board_1.data, 1);
-				this->bot_input_timer_1 = 0.0;
-				this->solution_1.erase(this->solution_1.begin() + 0);
-				break;
-			case MOVE_CCW:
-				this->board_1.real_piece.try_rotate(this->board_1.data, 3);
-				this->bot_input_timer_1 = 0.0;
-				this->solution_1.erase(this->solution_1.begin() + 0);
-				break;
-			case MOVE_LEFT:
-				if (this->bot_input_timer_1 >= this->bot_input_delay) {
-					this->board_1.real_piece.try_left(this->board_1.data);
-					this->bot_input_timer_1 = 0.0;
-					this->solution_1.erase(this->solution_1.begin() + 0);
-				}
-				break;
-			case MOVE_RIGHT:
-				if (this->bot_input_timer_1 >= this->bot_input_delay) {
-					this->board_1.real_piece.try_right(this->board_1.data);
-					this->bot_input_timer_1 = 0.0;
-					this->solution_1.erase(this->solution_1.begin() + 0);
-				}
-				break;
-			case MOVE_DOWN:
-				if (this->solution_1.size() == 1) {
-					if (this->bot_input_timer_1 >= this->bot_input_delay) {
-						this->board_1.real_piece.try_hard_drop(this->board_1.data);
-						this->bot_input_timer_1 = 0.0;
-						this->solution_1.erase(this->solution_1.begin() + 0);
-					}
-				}
-				else {
-					if (this->bot_input_timer_1 >= this->bot_input_delay) {
-						this->board_1.real_piece.try_down(this->board_1.data);
-						this->bot_input_timer_1 = 0.0;
-						if (this->board_1.real_piece.is_colliding(this->board_1.data, this->board_1.real_piece.x, this->board_1.real_piece.y + 1)) this->solution_1.erase(this->solution_1.begin() + 0);
-					}
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}*/
 
 	this->board_1.update(dt);
 	this->board_2.update(dt);

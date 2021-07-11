@@ -150,7 +150,7 @@ inline int eval::evaluate(node & node)
 
 	// waste time
 	// DEFINITION: Time is wasted if softdrop a non-t piece, soft drop t piece without t spin, or burn lines
-	if ((node.path[node.path.size - 1] & 0b10) == 0b10) {
+	if ((node.path & 0b10) == 0b10) {
 		// if just soft drop, but wasn't a t spin then wasted time
 		if (node.lock != LOCK_TSPIN_1 && node.lock != LOCK_TSPIN_2 && node.lock != LOCK_TSPIN_3 && node.lock != LOCK_PC) {
 			++node.time_wasted;
@@ -309,6 +309,7 @@ inline void eval::structure(bitboard& board, int column_height[10], int max_heig
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
 				++result[0];
+				//x = 8;
 				x += 2;
 				break;
 			}
@@ -331,6 +332,7 @@ inline void eval::structure(bitboard& board, int column_height[10], int max_heig
 					column_height[x] < 40 - y && column_height[x + 1] < 40 - y
 					)) {
 					++result[1];
+					//x = 8;
 					x += 2;
 					break;
 				}

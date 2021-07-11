@@ -1,58 +1,33 @@
 #include "beam.h"
 
-beam::beam(int depth, int width)
-{
-	this->depth = depth;
-	this->width[0] = width;
-	this->stack.reserve(this->depth + 1);
-	for (int i = 0; i < this->depth + 1; i++) {
-		this->stack.push_back(std::vector<node>());
-		if (i != 0) this->stack[i].reserve(beam::max_mem);
-		//this->stack[i].reserve(16000);
-	}
-	node root;
-	this->stack[0].push_back(root);
-}
-
 beam::beam(int depth)
 {
 	this->depth = depth;
 	this->stack.reserve(this->depth + 1);
 	for (int i = 0; i < this->depth + 1; i++) {
 		this->stack.push_back(std::vector<node>());
-		if (i != 0) this->stack[i].reserve(beam::max_mem);
+		if (i != 0 && i != this->depth) 
+			this->stack[i].reserve(beam::max_mem);
+		else
+			this->stack[i].reserve(1);
 		//this->stack[i].reserve(16000);
 	}
 	node root;
 	this->stack[0].push_back(root);
+	this->path_reward.clear();
 }
 
-void beam::reset(bool keep_memory)
+void beam::reset()
 {
-	if (keep_memory) {
-		int index = depth;
-		while (index > 0 && stack[index].size() < 1) { --index; }
-
-		if (index == 0) {
-			memory.clear();
-		}
-		else {
-			memory = stack[index][0].path;
-			memory.erase(0);
-		}
-	}
-
-	//this->stack.clear();
-	//this->stack.reserve(this->depth + 1);
 	for (int i = 0; i < this->depth + 1; ++i) {
 		this->stack[i].clear();
-		//this->stack[i].reserve(16000);
 	}
 	node root;
 	this->stack[0].push_back(root);
+	this->path_reward.clear();
 }
 
-void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<node>& new_beam, const int & beam_width, const bool & is_fisrt_time, const bool & is_last_beam, int & node_count)
+void beam::expand_node(node & parent, const int & pre_stack_index, const int & new_stack_index, const int & beam_width, const bool & is_first_iter, const bool & is_last_stack, int & node_count)
 {
 	if (parent.current == PIECE_NONE)
 		return;
@@ -65,19 +40,24 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 		node child;
 		parent.attempt(child, false, path_hd[parent.current][i], next_queue);
 		//child.path = parent.path;
-		child.path.add((0b00 | (parent.current << 2)) | ((i & 0b11111111) << 5));
+		//child.path.add((0b00 | (parent.current << 2)) | ((i & 0b11111111) << 5));
+		child.path = (0b00 | (parent.current << 2)) | ((i & 0b11111111) << 5);
 		child.score = evaluator.evaluate(child); // replace with a good evaluator
+		if (is_first_iter) {
+			child.org_path = child.path;
+			path_reward[child.org_path] = reward{1, child.score};
+		}
 
 		hard_drop_current.add(child.board);
 
-		if (is_last_beam) {
-			if ((int)new_beam.size() < 1) new_beam.push_back(child);
-			if (child.score > new_beam[0].score) new_beam[0] = child;
+		if (is_last_stack) {
+			if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+			if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+			//++path_reward[stack[new_stack_index][0].org_path].visit;
 		}
 		else {
-			if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-			new_beam.push_back(std::move(child));
-			std::push_heap(new_beam.begin(), new_beam.end());
+			stack[new_stack_index].push_back(std::move(child));
+			std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 		}
 		++node_count;
 	};
@@ -88,19 +68,24 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 				node child;
 				parent.attempt(child, true, path_hd[next_queue[parent.next]][i], next_queue);
 				//child.path = parent.path;
-				child.path.add((0b01 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
+				//child.path.add((0b01 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
+				child.path = (0b01 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5);
 				child.score = evaluator.evaluate(child); // replace with a good evaluator
+				if (is_first_iter) {
+					child.org_path = child.path;
+					path_reward[child.org_path] = reward{ 1, child.score };
+				}
 
 				hard_drop_hold.add(child.board);
 
-				if (is_last_beam) {
-					if ((int)new_beam.size() < 1) new_beam.push_back(child);
-					if (child.score > new_beam[0].score) new_beam[0] = child;
+				if (is_last_stack) {
+					if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+					if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+					//++path_reward[stack[new_stack_index][0].org_path].visit;
 				}
 				else {
-					if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-					new_beam.push_back(std::move(child));
-					std::push_heap(new_beam.begin(), new_beam.end());
+					stack[new_stack_index].push_back(std::move(child));
+					std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 				}
 				++node_count;
 			};
@@ -111,19 +96,24 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 			node child;
 			parent.attempt(child, true, path_hd[parent.hold][i], next_queue);
 			//child.path = parent.path;
-			child.path.add((0b01 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
+			//child.path.add((0b01 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
+			child.path = (0b01 | (parent.hold << 2)) | ((i & 0b11111111) << 5);
 			child.score = evaluator.evaluate(child); // replace with a good evaluator
+			if (is_first_iter) {
+				child.org_path = child.path;
+				path_reward[child.org_path] = reward{ 1, child.score };
+			}
 
 			hard_drop_hold.add(child.board);
 
-			if (is_last_beam) {
-				if ((int)new_beam.size() < 1) new_beam.push_back(child);
-				if (child.score > new_beam[0].score) new_beam[0] = child;
+			if (is_last_stack) {
+				if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+				if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+				//++path_reward[stack[new_stack_index][0].org_path].visit;
 			}
 			else {
-				if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-				new_beam.push_back(std::move(child));
-				std::push_heap(new_beam.begin(), new_beam.end());
+				stack[new_stack_index].push_back(std::move(child));
+				std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 			}
 			++node_count;
 		};
@@ -134,7 +124,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 		node child;
 		parent.attempt(child, false, path_sd[parent.current][i], next_queue);
 		//child.path = parent.path;
-		child.path.add((0b10 | (parent.current << 2)) | ((i & 0b11111111) << 5));
+		//child.path.add((0b10 | (parent.current << 2)) | ((i & 0b11111111) << 5));
+		child.path = (0b10 | (parent.current << 2)) | ((i & 0b11111111) << 5);
 
 		// check if existing
 		bool existed = false;
@@ -147,17 +138,21 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 		if (!existed) {
 			child.score = evaluator.evaluate(child); // replace with a good evaluator
+			if (is_first_iter) {
+				child.org_path = child.path;
+				path_reward[child.org_path] = reward{ 1, child.score };
+			}
 
 			hard_drop_current.add(child.board);
 
-			if (is_last_beam) {
-				if ((int)new_beam.size() < 1) new_beam.push_back(child);
-				if (child.score > new_beam[0].score) new_beam[0] = child;
+			if (is_last_stack) {
+				if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+				if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+				//++path_reward[stack[new_stack_index][0].org_path].visit;
 			}
 			else {
-				if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-				new_beam.push_back(std::move(child));
-				std::push_heap(new_beam.begin(), new_beam.end());
+				stack[new_stack_index].push_back(std::move(child));
+				std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 			}
 			++node_count;
 		}
@@ -169,7 +164,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 				node child;
 				parent.attempt(child, true, path_sd[next_queue[parent.next]][i], next_queue);
 				//child.path = parent.path;
-				child.path.add((0b11 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
+				//child.path.add((0b11 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5));
+				child.path = (0b11 | (next_queue[parent.next] << 2)) | ((i & 0b11111111) << 5);
 
 				// check if existing
 				bool existed = false;
@@ -182,17 +178,21 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 				if (!existed) {
 					child.score = evaluator.evaluate(child); // replace with a good evaluator
+					if (is_first_iter) {
+						child.org_path = child.path;
+						path_reward[child.org_path] = reward{ 1, child.score };
+					}
 
 					hard_drop_hold.add(child.board);
 
-					if (is_last_beam) {
-						if ((int)new_beam.size() < 1) new_beam.push_back(child);
-						if (child.score > new_beam[0].score) new_beam[0] = child;
+					if (is_last_stack) {
+						if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+						if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+						//++path_reward[stack[new_stack_index][0].org_path].visit;
 					}
 					else {
-						if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-						new_beam.push_back(std::move(child));
-						std::push_heap(new_beam.begin(), new_beam.end());
+						stack[new_stack_index].push_back(std::move(child));
+						std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 					}
 					++node_count;
 				}
@@ -204,7 +204,8 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 			node child;
 			parent.attempt(child, true, path_sd[parent.hold][i], next_queue);
 			//child.path = parent.path;
-			child.path.add((0b11 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
+			//child.path.add((0b11 | (parent.hold << 2)) | ((i & 0b11111111) << 5));
+			child.path = (0b11 | (parent.hold << 2)) | ((i & 0b11111111) << 5);
 
 			// check if existing
 			bool existed = false;
@@ -217,17 +218,21 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 
 			if (!existed) {
 				child.score = this->evaluator.evaluate(child); // replace with a good evaluator
+				if (is_first_iter) {
+					child.org_path = child.path;
+					path_reward[child.org_path] = reward{ 1, child.score };
+				}
 
 				hard_drop_hold.add(child.board);
 
-				if (is_last_beam) {
-					if ((int)new_beam.size() < 1) new_beam.push_back(child);
-					if (child.score > new_beam[0].score) new_beam[0] = child;
+				if (is_last_stack) {
+					if (stack[new_stack_index].empty()) stack[new_stack_index].push_back(child);
+					if (child.score > stack[new_stack_index][0].score) stack[new_stack_index][0] = child;
+					//++path_reward[stack[new_stack_index][0].org_path].visit;
 				}
 				else {
-					if ((int)new_beam.size() >= beam::max_mem) new_beam.pop_back();
-					new_beam.push_back(std::move(child));
-					std::push_heap(new_beam.begin(), new_beam.end());
+					stack[new_stack_index].push_back(std::move(child));
+					std::push_heap(stack[new_stack_index].begin(), stack[new_stack_index].end());
 				}
 				++node_count;
 			}
@@ -235,46 +240,23 @@ void beam::expand_node(node & parent, std::vector<node>& pre_beam, std::vector<n
 	}
 }
 
-void beam::expand(std::vector<node>& pre_beam, std::vector<node>& new_beam, const int & beam_width, const bool & is_fisrt_time, const bool & is_last_beam, int & node_count)
+void beam::expand(const int & pre_stack_index, const int & new_stack_index, const int & beam_width, const bool & is_first_iter, const bool & is_last_stack, int & node_count)
 {
 	// expand it by pop heap
 	for (int i = 0; i < beam_width; ++i) {
-		if (pre_beam.size() < 1) {
-			break;
-		}
-		expand_node(pre_beam[0], pre_beam, new_beam, beam_width, is_fisrt_time, is_last_beam, node_count);
+		if (stack[pre_stack_index].empty()) break;
+		expand_node(stack[pre_stack_index][0], pre_stack_index, new_stack_index, beam_width, is_first_iter, is_last_stack, node_count);
 
-		std::pop_heap(pre_beam.begin(), pre_beam.end());
-		pre_beam.pop_back();
+		// add reward
+		if (!is_first_iter) ++path_reward[stack[pre_stack_index][0].org_path].visit;
+		if (!stack[depth].empty()) ++path_reward[stack[depth][0].org_path].visit;
+
+		std::pop_heap(stack[pre_stack_index].begin(), stack[pre_stack_index].end());
+		stack[pre_stack_index].pop_back();
 	}
 
 	// discard the worst nodes since they are not worth checking
-	if ((int)pre_beam.size() < prune) pre_beam.clear();
-}
-
-/*
-Reset the beam while keeping the path led to the best node in previous search
-Maybe this will improve beam search? idk
-*/
-void beam::reconstuct_from_memory(int & iter_num, int & stack_index, int & node_count)
-{
-	if (memory.size > 0) {
-		node rebuild_node = stack[0][0];
-		for (int i = 0; i < memory.size; ++i) {
-			node temp_node;
-			if ((memory[i] & 0b10) == 0b10) { // if soft drop
-				rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_sd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
-			}
-			else {
-				rebuild_node.attempt(temp_node, ((memory[i] & 0b1) == 0b1), path_hd[(piece)((memory[i] & 0b11100) >> 2)][(memory[i] >> 5) & 0b11111111], next_queue);
-			}
-			rebuild_node = temp_node;
-			++node_count;
-		}
-		rebuild_node.path = memory;
-		stack[memory.size].push_back(rebuild_node);
-		expand(stack[memory.size], stack[memory.size + 1], 1, false, (memory.size == depth - 1), node_count);
-	}
+	if ((int)stack[pre_stack_index].size() < prune) stack[pre_stack_index].clear();
 }
 
 int beam::search()
@@ -297,11 +279,8 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 	int s_width = width[0];
 
 	if (iter_num == 0) {
-		// forced search from memory
-		reconstuct_from_memory(iter_num, stack_index, node_count);
-
-		// level 1 search
-		expand(stack[0], stack[1], 1, true, false, node_count);
+		// force level 1 search
+		expand(0, 1, 1, true, false, node_count);
 		stack_index = 0;
 	}
 	else {
@@ -315,7 +294,6 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 			s_width = width[0];
 			stack_index++;
 			if (stack_index >= depth) {
-				///*
 				stack_index = depth - 1;
 				while (stack[stack_index].size() < 1)
 				{
@@ -325,36 +303,22 @@ void beam::search_one_iter(int & iter_num, int & stack_index, int & node_count)
 				}
 				if (stack_index == 0)
 					return;
-				//*/
-
-				/*
-				stack_index = 1;
-				while (stack[stack_index].empty())
-				{
-					++stack_index;
-				}
-				if (stack_index >= depth)
-					return;//*/
 			}
 
 		}
 
-		expand(this->stack[stack_index], this->stack[stack_index + 1], s_width, false, (stack_index == depth - 1), node_count);
+		expand(stack_index, stack_index + 1, s_width, false, (stack_index == depth - 1), node_count);
 	}
 }
 
 int beam::get_lastest_solution()
 {
-	int index = depth;
-	while (index > 0 && stack[index].empty())
-	{
-		--index;
+	std::pair<int, reward> best_pair = std::make_pair(0, reward{-99999999, -99999999});
+	std::unordered_map<int, reward>::iterator current_pair;
+	for (current_pair = path_reward.begin(); current_pair != path_reward.end(); ++current_pair) {
+		if (current_pair->second > best_pair.second) {
+			best_pair = std::make_pair(current_pair->first, current_pair->second);
+		}
 	}
-
-	if (index == 0) {
-		return 0;
-	}
-	else {
-		return stack[index][0].path[0];
-	}
+	return best_pair.first;
 }

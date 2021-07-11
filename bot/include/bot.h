@@ -24,7 +24,7 @@ class bot
 public:
 	std::thread * thread;
 
-	void thread_start(int depth, weight weight, bool memory);
+	void thread_start(int depth, weight weight);
 	void thread_destroy();
 	path_data request_solution();
 	void set_new_data(bot_data new_data);

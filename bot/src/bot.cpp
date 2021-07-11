@@ -1,12 +1,12 @@
 #include "bot.h"
 
-void bot::thread_start(int depth, weight w, bool memory)
+void bot::thread_start(int depth, weight w)
 {
 	solution_ready = false;
 	solution_need = false;
 	running = true;
 
-	this->thread = new std::thread([&](int bot_depth, weight bot_weight, bool bot_keep_memory) {
+	this->thread = new std::thread([&](int bot_depth, weight bot_weight) {
 		beam bot_beam(bot_depth);
 		int iter_num = 0;
 		int stack_index = 0;
@@ -39,7 +39,7 @@ void bot::thread_start(int depth, weight w, bool memory)
 				lk.lock();
 			}
 			if (!new_data_buffer.empty()) {
-				bot_beam.reset(bot_keep_memory);
+				bot_beam.reset();
 
 				iter_num = 0;
 				stack_index = 0;
@@ -62,7 +62,7 @@ void bot::thread_start(int depth, weight w, bool memory)
 			}
 		}
 
-	}, depth, w, memory);
+	}, depth, w);
 }
 
 void bot::thread_destroy()
