@@ -1,5 +1,7 @@
 # Tetris bot
 Badly implemented tetris bot
+This was my first attemp on making a tetris AI. I've learn a lot since then and the project has becoming more and more unmaintainable. 
+See the bot's successor: https://github.com/citrus610/lemon-tea
 
 ## How to build
 ### Install SFML
